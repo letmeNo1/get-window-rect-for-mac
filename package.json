@@ -1,6 +1,6 @@
 {
   "name": "get-window-rect-by-pid",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "通过PID返回窗口坐标",
   "main": "index.js",
   "dependencies": {

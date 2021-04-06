@@ -53,12 +53,6 @@ Napi::Value getWindowRect(const Napi::CallbackInfo& info) {
                 break;
             }
     }
-    std::cout << (int)numWindows << "\n";
-
-    std::cout << windowsRectlist[44][3] << "\n";
-    std::cout << windowsRectlist[44][2] << "\n";
-    std::cout << windowsRectlist[44][1] << "\n";
-    std::cout << windowsRectlist[44][0] << "\n";
     Napi::Array arr2 = Napi::Array::New(env,(int)numWindows);
 
     // 将坐标添加到c++数组转换成js能识别的数组
