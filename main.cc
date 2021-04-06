@@ -10,12 +10,19 @@ Napi::Value getWindowRect(const Napi::CallbackInfo& info) {
 
   CGWindowID windowID;
   CGRect rect;
-  double* list = new double[4];
 
   CFArrayRef windowList = CGWindowListCopyWindowInfo(
           kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
 
   CFIndex numWindows = CFArrayGetCount( windowList );
+  double* rectList = new double[4];
+
+  double** windowsRectlist = new double*[(int)numWindows];
+  for (int i=0;i<(int)numWindows;i++)
+	{
+                windowsRectlist[i] = new double[4];
+	}
+
   for( int i = 0; i < (int)numWindows; i++ ) {
         CFDictionaryRef info = (CFDictionaryRef)CFArrayGetValueAtIndex(
                 windowList, i);
@@ -30,22 +37,49 @@ Napi::Value getWindowRect(const Napi::CallbackInfo& info) {
                              kCGWindowIDCFNumberType,
                              &windowID);
         //这里要再将窗口Id转换成double类型以便跟我们传入的参数进行对比
-        if ((double)windowID==arg0) {
-                CFDictionaryRef bounds = (CFDictionaryRef)CFDictionaryGetValue (info, kCGWindowBounds);
-                CGRectMakeWithDictionaryRepresentation(bounds, &rect);
+        if (0 ==arg0) {
                   // 将坐标添加到c++数组中
-                list[0] = (int) rect.origin.x;
-                list[1] = (int) rect.origin.y;
-                list[2] = (int) rect.size.width;
-                list[3] = (int) rect.size.height;
+                windowsRectlist[i][0] = (int) rect.origin.x;
+                windowsRectlist[i][1] = (int) rect.origin.y;
+                windowsRectlist[i][2] = (int) rect.size.width;
+                windowsRectlist[i][3] = (int) rect.size.height;
+            }
+        else if ((double)windowID==arg0) {
+                  // 将坐标添加到c++数组中
+                rectList[0] = (int) rect.origin.x;
+                rectList[1] = (int) rect.origin.y;
+                rectList[2] = (int) rect.size.width;
+                rectList[3] = (int) rect.size.height;
+                break;
             }
     }
-    Napi::Array arr = Napi::Array::New(env,4);
+    std::cout << (int)numWindows << "\n";
+
+    std::cout << windowsRectlist[44][3] << "\n";
+    std::cout << windowsRectlist[44][2] << "\n";
+    std::cout << windowsRectlist[44][1] << "\n";
+    std::cout << windowsRectlist[44][0] << "\n";
+    Napi::Array arr2 = Napi::Array::New(env,(int)numWindows);
+
     // 将坐标添加到c++数组转换成js能识别的数组
-    for (int i = 0; i < 4; i++) {
-      arr[i] = Napi::Number::New(env, list[i]);
+    if (0 ==arg0) {
+        for (int j = 0; j < (int)numWindows; j++) {
+                Napi::Array arr = Napi::Array::New(env,4);
+                for (int i = 0; i < 4; i++) {
+                        arr[i] = Napi::Number::New(env, windowsRectlist[j][i]);
+        }
+        arr2[j]=arr;
     }
-    return arr;
+    return arr2;
+    }else{
+        Napi::Array arr = Napi::Array::New(env,4);
+         for (int i = 0; i < 4; i++) {
+                 arr[i] = Napi::Number::New(env, rectList[i]);
+        }
+        return arr;
+    }
+
+    
 }
 
 // 入口函数，用于注册我们的函数、对象等等

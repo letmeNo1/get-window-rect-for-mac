@@ -1,6 +1,6 @@
 {
-  "name": "get-window-rect-for-mac",
-  "version": "1.0.7",
+  "name": "get-window-rect-by-pid",
+  "version": "1.0.1",
   "description": "通过PID返回窗口坐标",
   "main": "index.js",
   "dependencies": {
