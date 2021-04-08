@@ -1,6 +1,7 @@
 #include <napi.h>
 #include <iostream>
 #include <Carbon/Carbon.h>
+
 // 定义 Add 函数
 Napi::Value getWindowRect(const Napi::CallbackInfo& info) {
   Napi::Env env = info.Env();
@@ -10,41 +11,63 @@ Napi::Value getWindowRect(const Napi::CallbackInfo& info) {
 
   CGWindowID windowID;
   CGRect rect;
+  int layer;
+  char *buffer = (char *)malloc(400);
+
 
   CFArrayRef windowList = CGWindowListCopyWindowInfo(
           kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
 
+  
   CFIndex numWindows = CFArrayGetCount( windowList );
   double* rectList = new double[4];
 
   double** windowsRectlist = new double*[(int)numWindows];
+
   for (int i=0;i<(int)numWindows;i++)
 	{
                 windowsRectlist[i] = new double[4];
-	}
+}
 
   for( int i = 0; i < (int)numWindows; i++ ) {
+
         CFDictionaryRef info = (CFDictionaryRef)CFArrayGetValueAtIndex(
                 windowList, i);
-        //获取窗口ID
-        CFStringRef appPID = (CFStringRef)CFDictionaryGetValue(
-                info, kCGWindowOwnerPID);
-        //appPID
+
+        CFNumberGetValue((CFNumberRef)CFDictionaryGetValue(info, kCGWindowLayer),kCFNumberIntType, &layer);
+
         CFDictionaryRef bounds = (CFDictionaryRef)CFDictionaryGetValue (info, kCGWindowBounds);
         CGRectMakeWithDictionaryRepresentation(bounds, &rect);
+
+        //获取应用名称
+        CFStringRef appName = (CFStringRef)CFDictionaryGetValue(
+                info, kCGWindowOwnerName);
+
+        //获取应用的层级并转换为可读取的类型
+        CFNumberGetValue((CFNumberRef)CFDictionaryGetValue(info, kCGWindowLayer),kCFNumberIntType, &layer);
+
+        //将应用名转换为可读取的类型
+        CFStringGetCString(appName, buffer, 400, kCFStringEncodingUTF8);
+
         //讲窗口id转换成CGWindowID类型
         CFNumberGetValue((CFNumberRef)CFDictionaryGetValue(info, kCGWindowNumber),
                              kCGWindowIDCFNumberType,
                              &windowID);
-        //这里要再将窗口Id转换成double类型以便跟我们传入的参数进行对比
-        if (0 ==arg0) {
+        if (0 ==arg0 && appName != 0 && layer >=0) {
+                std::cout << buffer << "\n";
+                std::cout << (int) rect.origin.x << "\n";
+                std::cout << (int) rect.origin.y << "\n";
+                std::cout << (int) rect.size.width << "\n";
+                std::cout << (int) rect.size.height << "\n";
+
                   // 将坐标添加到c++数组中
                 windowsRectlist[i][0] = (int) rect.origin.x;
                 windowsRectlist[i][1] = (int) rect.origin.y;
                 windowsRectlist[i][2] = (int) rect.size.width;
                 windowsRectlist[i][3] = (int) rect.size.height;
             }
-        else if ((double)windowID==arg0) {
+        //这里要再将窗口Id转换成double类型以便跟我们传入的参数进行对比
+        else if ((double)windowID==arg0 && appName != 0 && layer >=0 ) {
                   // 将坐标添加到c++数组中
                 rectList[0] = (int) rect.origin.x;
                 rectList[1] = (int) rect.origin.y;
@@ -54,6 +77,7 @@ Napi::Value getWindowRect(const Napi::CallbackInfo& info) {
             }
     }
     Napi::Array arr2 = Napi::Array::New(env,(int)numWindows);
+    
 
     // 将坐标添加到c++数组转换成js能识别的数组
     if (0 ==arg0) {
