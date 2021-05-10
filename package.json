@@ -1,7 +1,7 @@
 {
-  "name": "get-desktop-capture",
-  "version": "1.0.8",
-  "description": "获取桌面截图",
+  "name": "get-window-rect-by-pid",
+  "version": "1.0.3",
+  "description": "通过PID返回窗口坐标",
   "main": "index.js",
   "dependencies": {
     "bindings": "1.5.0",

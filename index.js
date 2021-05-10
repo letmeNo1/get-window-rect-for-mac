@@ -1,2 +1,2 @@
-const  getDesktopCapture  = require('bindings')('main.node')
-module.exports = getDesktopCapture
+const  getWindowRect  = require('bindings')('main.node')
+module.exports = getWindowRect
