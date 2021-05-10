@@ -1,3 +1,3 @@
-const { getWindowRect } = require('bindings')('main.node')
+const { getDesktopCapture } = require('bindings')('main.node')
 
-console.log(getWindowRect(0))     // 3
+getDesktopCapture("/Users/rcadmin/Desktop",724071234,0,0,1920,1080,"xx")
